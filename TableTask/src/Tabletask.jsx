@@ -7,6 +7,8 @@ const Tabletask = () => {
     const [titles,setTitles] = useState("");
     const [unique,setUnique] = useState([]);
     const [unibtn,setUnibtn] = useState(false);
+    const [sortedData, setSortedData] = useState([]);
+    const [isSorted, setIsSorted] = useState(false);
 
     const handlebutton = (currdata) => {
         setData((prevData) => [...prevData, currdata]);
@@ -27,6 +29,17 @@ const Tabletask = () => {
         setUnique(uni);
     },[data]
     );
+
+    const handleSort = () => {
+        let rows = unibtn ? [...unique] : [...data];
+        rows.sort((a, b) => {
+            const colA = a.split(",")[1]?.trim() || "";
+            const colB = b.split(",")[1]?.trim() || "";
+            return colA.localeCompare(colB, undefined, { numeric: true });
+        });
+        setSortedData(rows);
+        setIsSorted(true);
+    };
 
 
     return(
@@ -65,41 +78,25 @@ const Tabletask = () => {
                                 <th key={index}>
                                     {title.trim()}
                                     {index === 0 && <button onClick={() => setUnibtn(!unibtn)}>Remove Duplicates</button>}
+                                    {index === 1 && (
+                                    <button onClick={handleSort}>Sort</button>
+                                    )}
                                 </th>
                             ))
                         }
                     </tr>
                 </thead>
                 <tbody>
-                    {
-                        unibtn ? unique.map(
-                            (item,index) => {
-                                const currData = item.split(",");
-                                return(
-                                    <tr key={index}>
-                                        {currData.slice(0,cols).map((ele,i) => 
-                                            (<td key={i}>
-                                                {ele.trim()}
-                                            </td>
-                                        ))}
-                                    </tr>
-                                )
-                            }
-                        ) : data.map(
-                            (item,index) => {
-                                const currData = item.split(",");
-                                return(
-                                    <tr key={index}>
-                                        {currData.slice(0,cols).map((ele,i) => 
-                                            (<td key={i}>
-                                                {ele.trim()}
-                                            </td>
-                                        ))}
-                                    </tr>
-                                )
-                            }
-                        )
-                    }
+                {(isSorted ? sortedData : unibtn ? unique : data).map((item, index) => {
+                        const currData = item.split(",");
+                        return (
+                            <tr key={index}>
+                                {currData.slice(0, cols).map((ele, i) => (
+                                    <td key={i}>{ele.trim()}</td>
+                                ))}
+                            </tr>
+                        );
+                    })}
                 </tbody>
             </table>
         </>
